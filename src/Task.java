@@ -4,70 +4,68 @@ import java.time.format.DateTimeFormatter;
 
 
 public  class Task {
-    private int id;
+    private static int nextID = 0;
+    private final int id;
     private String name;
     private int priority;
     private final LocalDate creationDate;
-    private String completed;
-    private LocalDateTime complectionDate;
+    private TaskStatus status;
+    private LocalDateTime completionDate;
 
-    public Task(int id, String name, int priority, LocalDate now) {
-        this.id = id;
+    public Task(String name, int priority) {
+        this.id = ++nextID;
         this.name = name;
         this.priority = priority;
         this.creationDate = LocalDate.now();
-        this.completed = "Невыполнена";
-        this.complectionDate = null;
+        this.status = TaskStatus.NOT_COMPLETED;
+        this.completionDate = null;
     }
-
+    public int getId() {return id;}
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
-
     public int getPriority() {
         return priority;
     }
-
     public void setPriority(int priority) {
         this.priority = priority;
     }
-
-
-    public LocalDate getCreationDate() {
-        return creationDate;
+    public TaskStatus getStatus() {
+        return status;
     }
+    public void setStatus(TaskStatus newStatus) {
+        if (this.status != newStatus) {
+            this.status = newStatus;
+            if (newStatus == TaskStatus.COMPLETED) {
+                this.completionDate = LocalDateTime.now();
+            } else {
+                this.completionDate = null;
+            }
+        }
 
-    public LocalDateTime getCompletionDate() {
-        return complectionDate;
-    }
-
-    public String getCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(String completed) {
-        this.completed = completed;
-    }
-
-    public LocalDateTime getComplectionDate() {
-        return complectionDate;
-    }
-
-    public void setComplectionDate(LocalDateTime complectionDate) {
-        this.complectionDate = complectionDate;
     }
 
     @Override
     public String toString() {
         return id + ". " + name + " | " + priority
-                + " | Статус: " + completed+
+                + " | Статус: " + status.getDescription()+
                 "| Дата создания: " + creationDate
-                + "| Дата выполнения: " + complectionDate;
+                + "| Время выполнения: " + (completionDate != null
+                                           ? completionDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+                                           : "отсутствует");
 
     }
+
+    public static Task findTask(int id) {
+        return TaskServis.tasks.stream()
+                .filter(t -> t.getId() == id)
+                .findFirst()
+                .orElse(null);}
+
+
+
 }
+
