@@ -4,9 +4,13 @@ import java.util.Scanner;
 
 
 public class MainClass {
-    int id;
-    Scanner scanner = new Scanner(System.in);
-    TaskServis taskServis = new TaskServis();
+    private TaskServis taskServis;
+    private Scanner scanner;
+
+    public MainClass(){
+        this.taskServis = new TaskServis();
+        this.scanner = new Scanner(System.in);
+    }
 
     public static void main(String[] args) {
         MainClass mainclass = new MainClass();
@@ -70,12 +74,14 @@ public class MainClass {
     }
 
     private void deleteTask() {
+        showTask();
         System.out.print("Введите номер задачи для удаления: ");
         try {
             scanner.nextLine();
-            id = Integer.parseInt(scanner.nextLine());
-            if (taskServis.deleteTask(id)) {
-                System.out.println("Задача под номером " + id + ". успешно удалена.");
+            int taskId = Integer.parseInt(scanner.nextLine());
+            boolean wasDelete = taskServis.deleteTask(taskId);
+            if (wasDelete) {
+                System.out.println("Задача под номером " + taskId + ". успешно удалена.");
             } else {
                 System.out.println("Неверный номер задачи.");
             }
@@ -99,7 +105,8 @@ public class MainClass {
     }
 
     private void showTask() {
-        if (taskServis.tasks.isEmpty()) {
+        List<Task> tasks = taskServis.getAllTasks();
+        if (tasks.isEmpty()) {
             System.out.println(" Список задач пуст. ");
             return;
         }
@@ -108,15 +115,17 @@ public class MainClass {
     }
 
     private void editTask() {
+        showTask();
         System.out.println("Введите номер задачи для редактирования:");
         try {
             scanner.nextLine();
-            id = Integer.parseInt(scanner.nextLine());
+            int taskId = Integer.parseInt(scanner.nextLine());
             System.out.println("Введите новой приоритет(число)");
             int newPriority = Integer.parseInt(scanner.nextLine());
             System.out.println("Введите новое название задачи");
             String newName = scanner.nextLine();
-            if (taskServis.editTask(id, newName, newPriority)) {
+            boolean wasEdit = taskServis.editTask(taskId, newName, newPriority);
+            if (wasEdit) {
                 System.out.println("Задача обновлена.");
             } else {
                 System.out.println("Неверный номер задачи.");
@@ -153,10 +162,11 @@ public class MainClass {
     }
 
     private void changeStatus() {
+        showTask();
         System.out.print("Введите номер задачи:");
         try {
             scanner.nextLine();
-            id = Integer.parseInt(scanner.nextLine());
+            int taskId = Integer.parseInt(scanner.nextLine());
             System.out.println("Выберете новый статус");
             for (TaskStatus s : TaskStatus.values()) {
                 System.out.println(s.ordinal() + 1 + ". " + s.getDescription());
@@ -168,7 +178,8 @@ public class MainClass {
                 default -> TaskStatus.NOT_COMPLETED;
             };
             System.out.println("Ваш выбор: " + statusChoice);
-            if (taskServis.changeStatus(id, completed)) {
+            boolean wasChange = taskServis.changeStatus(taskId, completed);
+            if (wasChange) {
                 System.out.println("Задача обновлена! Статус:  " + completed.getDescription());
             } else {
                 System.out.println("Неверный номер задачи.");

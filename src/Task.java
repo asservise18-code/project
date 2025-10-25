@@ -4,16 +4,15 @@ import java.time.format.DateTimeFormatter;
 
 
 public class Task {
-    private static int nextID = 0;
-    private final int id;
+    private int id;
     private String name;
     private int priority;
     private final LocalDate creationDate;
     private TaskStatus status;
     private LocalDateTime completionDate;
 
-    public Task(String name, int priority) {
-        this.id = ++nextID;
+    public Task(int id, String name, int priority) {
+        this.id = id;
         this.name = name;
         this.priority = priority;
         this.creationDate = LocalDate.now();
