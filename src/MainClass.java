@@ -75,18 +75,16 @@ public class MainClass {
 
     private void deleteTask() {
         showTask();
-        System.out.print("Введите номер задачи для удаления: ");
         try {
+            System.out.print("Введите номер задачи для удаления: ");
             scanner.nextLine();
             int taskId = Integer.parseInt(scanner.nextLine());
-            boolean wasDelete = taskServis.deleteTask(taskId);
-            if (wasDelete) {
-                System.out.println("Задача под номером " + taskId + ". успешно удалена.");
-            } else {
-                System.out.println("Неверный номер задачи.");
-            }
+            taskServis.deleteTask(taskId);
+            System.out.println("Задача под номером " + taskId + " успешно удалена.");
         } catch (NumberFormatException e) {
-            System.out.println("Некорректный ввод. Пожалуйста, введите число.");
+            System.out.println("Ошибка: Некорректный ввод. Пожалуйста, введите число.");
+        } catch (TaskNotFoundException e) {
+            System.out.println("Ошибка: " + e.getMessage());
         }
     }
 
@@ -111,7 +109,7 @@ public class MainClass {
             return;
         }
         System.out.println(" Список задач ");
-        taskServis.showTask();
+        tasks.forEach(System.out::println);
     }
 
     private void editTask() {
@@ -120,19 +118,16 @@ public class MainClass {
         try {
             scanner.nextLine();
             int taskId = Integer.parseInt(scanner.nextLine());
-            System.out.println("Введите новой приоритет(число)");
-            int newPriority = Integer.parseInt(scanner.nextLine());
-            System.out.println("Введите новое название задачи");
+            System.out.println("Введите новое название задачи:");
             String newName = scanner.nextLine();
-            boolean wasEdit = taskServis.editTask(taskId, newName, newPriority);
-            if (wasEdit) {
-                System.out.println("Задача обновлена.");
-            } else {
-                System.out.println("Неверный номер задачи.");
-            }
+            System.out.println("Введите новый приоритет (число):");
+            int newPriority = Integer.parseInt(scanner.nextLine());
+            taskServis.editTask(taskId, newName, newPriority);
+            System.out.println("Задача успешно обновлена.");
         } catch (NumberFormatException e) {
-            System.out.println("Некорректный ввод. Пожалуйста, введите число.");
-
+            System.out.println("Ошибка: Некорректный ввод. Пожалуйста, введите число.");
+        } catch (TaskNotFoundException e) {
+            System.out.println("Ошибка: " + e.getMessage());
         }
     }
 
@@ -155,39 +150,38 @@ public class MainClass {
         var found = taskServis.findWordTask(keyWord);
         if (found.isEmpty()) {
             System.out.println("Задачи не найдены по ключевому слову: " + keyWord);
-        } else {
+            return;
+        }
             System.out.println("Задачи по ключевому слову: " + keyWord);
             found.forEach(System.out::println);
-        }
     }
+
 
     private void changeStatus() {
         showTask();
-        System.out.print("Введите номер задачи:");
+
         try {
+            System.out.print("Введите номер задачи: ");
             scanner.nextLine();
             int taskId = Integer.parseInt(scanner.nextLine());
-            System.out.println("Выберете новый статус");
+            System.out.println("Выберите новый статус:");
             for (TaskStatus s : TaskStatus.values()) {
-                System.out.println(s.ordinal() + 1 + ". " + s.getDescription());
+                System.out.println((s.ordinal() + 1) + ". " + s.getDescription());
             }
-            int statusChoice = scanner.nextInt();
-            TaskStatus completed = switch (statusChoice) {
+            int statusChoice = Integer.parseInt(scanner.nextLine());
+
+            TaskStatus newStatus = switch (statusChoice) {
                 case 1 -> TaskStatus.COMPLETED;
                 case 2 -> TaskStatus.IN_PROGRESS;
                 default -> TaskStatus.NOT_COMPLETED;
             };
-            System.out.println("Ваш выбор: " + statusChoice);
-            boolean wasChange = taskServis.changeStatus(taskId, completed);
-            if (wasChange) {
-                System.out.println("Задача обновлена! Статус:  " + completed.getDescription());
-            } else {
-                System.out.println("Неверный номер задачи.");
-            }
+            taskServis.changeStatus(taskId, newStatus);
+            System.out.println("Задача обновлена! Статус: " + newStatus.getDescription());
         } catch (NumberFormatException e) {
-            System.out.println("Некорректный ввод. Пожалуйста, введите число для номера.");
+            System.out.println("Ошибка: Некорректный ввод. Пожалуйста, введите число.");
+        } catch (TaskNotFoundException e) {
+            System.out.println("Ошибка: " + e.getMessage());
         }
-
     }
 
     private void showStatistics() {

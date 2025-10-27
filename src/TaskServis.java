@@ -20,35 +20,27 @@ public class TaskServis {
         tasks.add(new Task(nextID++, name, priority));
     }
 
-    public void showTask() {
-        tasks.forEach(System.out::println);
-    }
-
-    public boolean deleteTask(int id) {
-        return tasks.removeIf(task -> task.getId() == id);
+    public void deleteTask(int id) {
+        Task taskToDelete = getTaskById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена."));
+        tasks.remove(taskToDelete);
     }
 
     public Optional<Task> getTaskById(int id) {
         return tasks.stream() .filter(task -> task.getId() == id) .findFirst();
     }
 
-    public boolean editTask(int id, String newName, int newPriority) {
-        Optional<Task> taskOptional = getTaskById(id);
-        if (taskOptional.isPresent()) {
-            taskOptional.get().setName(newName);
-            taskOptional.get().setPriority(newPriority);
-            return true;
-        }
-        return false;
+    public void editTask(int id, String newName, int newPriority) {
+        Task task = getTaskById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена."));
+        task.setName(newName);
+        task.setPriority(newPriority);
     }
 
-    public boolean changeStatus(int id, TaskStatus status) {
-        Optional<Task> taskOptional = getTaskById(id);
-        if (taskOptional.isPresent()) {
-            taskOptional.get().setStatus(status);
-            return true;
-        }
-        return false;
+    public void changeStatus(int id, TaskStatus status) {
+        getTaskById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена."))
+                .setStatus(status);
     }
 
     public List<Task> filterCompletedStatus(TaskStatus status) {
